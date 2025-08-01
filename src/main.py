@@ -6,8 +6,8 @@ from openai import OpenAI
 from rich.console import Console
 
 # Load functions from helpers 
-from helpers.calculator import calculate, calculator_function
-from helpers.weather import get_weather
+from helpers.calculator import calculate, calculator_function, process_calculator_response
+from helpers.weather import get_weather, get_weather_function, process_weather_response
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,30 +20,6 @@ messages = [
     ]
 
 
-def process_calculator_response(tool_call):
-    """Process calculator function call and return the result message"""
-    # Parse the function arguments
-    arguments = json.loads(tool_call.function.arguments)
-    operation = arguments.get("operation")
-    x = arguments.get("x")
-    y = arguments.get("y")
-
-    print(f"Function call: calculate({operation}, {x}, {y})")
-
-    # Call the function
-    result = calculate(operation, x, y)
-
-    print(f"Function result: {result}")
-
-    # Return the function result message
-    return {
-        "role": "tool",
-        "tool_call_id": tool_call.id,
-        "name": "calculate",
-        "content": str(result)
-    }
-
-
 def chat_with_functions(user_input):
     # Add user's message to the conversation 
     messages.append({"role": "user", "content": user_input})
@@ -54,7 +30,7 @@ def chat_with_functions(user_input):
         messages=messages,
         temperature = 0.7, 
         max_tokens = 150,
-        tools = [calculator_function],
+        tools = [calculator_function, get_weather_function],
         tool_choice = "auto",
         )
     
@@ -68,12 +44,16 @@ def chat_with_functions(user_input):
             function_name = tool_call.function.name
 
             if function_name == "calculate":
-                # Process calculator function call
+                # Process calculator function call and append the result to messages
                 result_message = process_calculator_response(tool_call)
-                
-                # Add the function result to the conversation
                 messages.append(result_message)
                 
+            elif function_name == "get_weather":
+                # Process weather function call and append the result to messages
+                result_message = process_weather_response(tool_call)
+                messages.append(result_message)
+            
+            
             # Get a new response from the model with the function result
             second_response = client.chat.completions.create(
                 model="gpt-4o-mini",
@@ -87,6 +67,8 @@ def chat_with_functions(user_input):
 
 def main(): 
     chat_with_functions("What's 241 multiplied by 18?")
+    chat_with_functions("What's the weather in Melbourne?")
+    chat_with_functions("What's the humidity in Melbourne? Should I take an umbrella?")
   
   
 if __name__ == "__main__":

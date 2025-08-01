@@ -1,3 +1,6 @@
+import json
+
+
 # Define a function that performs calculations
 def calculate(operation, x, y):
     """
@@ -51,3 +54,26 @@ calculator_function = {
         }
     }
 }
+
+def process_calculator_response(tool_call):
+    """Process calculator function call and return the result message"""
+    # Parse the function arguments
+    arguments = json.loads(tool_call.function.arguments)
+    operation = arguments.get("operation")
+    x = arguments.get("x")
+    y = arguments.get("y")
+
+    print(f"Function call: calculate({operation}, {x}, {y})")
+
+    # Call the function
+    result = calculate(operation, x, y)
+
+    print(f"Function result: {result}")
+
+    # Return the function result message
+    return {
+        "role": "tool",
+        "tool_call_id": tool_call.id,
+        "name": "calculate",
+        "content": str(result)
+    }
