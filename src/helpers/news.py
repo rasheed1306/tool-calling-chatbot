@@ -56,5 +56,29 @@ get_news_function = {
     }
 }
 
+def process_news_response(tool_call):
+    """Process news function call and return the result message"""
+    # Parse the function arguments
+    arguments = json.loads(tool_call.function.arguments)
+    query = arguments.get("query")
+    sources = arguments.get("sources")
+    category = arguments.get("category")
+    country = arguments.get("country")
+
+    print(f"Function call: get_news(query='{query}', sources='{sources}', category='{category}', country='{country}')")
+
+    # Call the function
+    result = get_news(query, sources, category, country)
+
+    print(f"Function result: Found {len(result)} articles")
+
+    # Return the function result message
+    return {
+        "role": "tool",
+        "tool_call_id": tool_call.id,
+        "name": "get_news",
+        "content": str(result)
+    }
+
 
 
