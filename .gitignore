@@ -9,6 +9,7 @@ wheels/
 # Virtual environments
 .venv
 
-# .env files 
+# .env files
 .env
-.env.*
+.env.local
+.env.*.local
