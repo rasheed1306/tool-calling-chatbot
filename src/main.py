@@ -72,8 +72,8 @@ def chat_with_functions(user_input):
 
 
 def main(): 
-    # chat_with_functions("What's 241 multiplied by 18?")
-    # chat_with_functions("What's the weather in Melbourne?")
+    chat_with_functions("What's 241 multiplied by 18?")
+    chat_with_functions("What's the weather in Melbourne?")
     chat_with_functions("Can you tell me latest news about bitcoin from 2/07/2025?")
   
   
