@@ -2,8 +2,8 @@ from dotenv import load_dotenv
 from newsapi import NewsApiClient
 import os
 import json 
-import requests
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List
+from openai.types.chat import ChatCompletionToolParam
 
 # Load environment variables from .env file
 load_dotenv()
@@ -56,7 +56,7 @@ def get_news(query: str, from_: str | None, to: str | None,
         return []
 
 # Define the function schema
-get_news_function = {
+get_news_function: ChatCompletionToolParam = {
     "type": "function",
     "function": {
         "name": "get_news",

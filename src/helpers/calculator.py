@@ -1,5 +1,7 @@
 import json
-from typing import Dict, Union, Literal, Any
+from typing import Dict, Literal, Any
+from openai.types.chat import ChatCompletionMessage, ChatCompletionMessageParam, ChatCompletionToolParam
+
 
 # Type definitions
 OperationType = Literal["add", "subtract", "multiply", "divide"]
@@ -33,7 +35,7 @@ def calculate(operation: OperationType, x: NumberType, y: NumberType) -> ResultT
         return f"Error: Unknown operation '{operation}'"
 
 # Define the function schema
-calculator_function = {
+calculator_function: ChatCompletionToolParam= {
     "type": "function",
     "function": {
         "name": "calculate",

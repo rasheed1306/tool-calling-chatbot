@@ -3,11 +3,12 @@ import os
 import json 
 import requests
 from typing import Dict, Any
+from openai.types.chat import ChatCompletionToolParam
 
 # Load environment variables from .env file
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env'))
 
-WEATHER_API_KEY: str = os.getenv("WEATHER_API_KEY")
+WEATHER_API_KEY: str | None = os.getenv("WEATHER_API_KEY")
 WEATHER_URL_BASE: str = "https://api.weatherapi.com/v1/current.json"
 
 
@@ -37,7 +38,7 @@ def get_weather(location: str = "Melbourne") -> float:
     return temp_c
 
 # Define the function schema
-get_weather_function = {
+get_weather_function: ChatCompletionToolParam = {
     "type": "function",
     "function": {
         "name": "get_weather",
