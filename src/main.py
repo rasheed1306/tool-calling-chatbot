@@ -5,8 +5,7 @@ from openai.types.chat import  ChatCompletionMessageParam
 from rich.console import Console
 from rich.panel import Panel
 from rich.rule import Rule
-from typing import Dict, List, Any, cast
-from rich import Console, Panel, Rule
+from typing import List, cast
 
 # Load functions from helpers 
 from helpers.calculator import calculator_function, process_calculator_response
@@ -115,3 +114,4 @@ def main() -> None:
   
 if __name__ == "__main__":
     main()
+    print("testestsetestsetst")
