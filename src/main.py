@@ -110,8 +110,16 @@ def main() -> None:
     chat_with_functions("What's 241 multiplied by 18?")
     chat_with_functions("What's the weather in Melbourne?")
     chat_with_functions("Can you tell me latest news about bitcoin from 2/07/2025?")
-  
-  
+    
+    while True:
+        usr_input = input("Enter a prompt (or q to quit): ")
+        if usr_input.lower() == "q":
+            console.print("[bold red]Exiting...[/bold red]")
+            break
+
+        chat_with_functions(usr_input)
+        console.print(Rule(style="white"))
+
+
 if __name__ == "__main__":
     main()
-    print("testestsetestsetst")
