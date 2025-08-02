@@ -4,21 +4,25 @@ import os
 import json 
 from typing import Dict, Any, List
 from openai.types.chat import ChatCompletionToolParam
+from rich.console import Console
 
 # Load environment variables from .env file
 load_dotenv()
 
+# Initialize console for rich text output
+console = Console()
+
 # Initialize NewsAPI client with error checking
 api_key = os.getenv("NEWS_API_KEY")
 if not api_key:
-    print("Error: NEWS_API_KEY not found in environment variables. Please check your .env file.")
+    console.print("[red]Error:[/red] NEWS_API_KEY not found in environment variables. Please check your .env file.")
     newsapi = None
 else:
     try:
         newsapi = NewsApiClient(api_key=api_key)
-        print("NewsAPI client initialized successfully.")
+        console.print("[green]✓[/green] NewsAPI client initialized successfully.")
     except Exception as e:
-        print(f"Error: Failed to initialize NewsAPI client: {e}")
+        console.print(f"[red]Error:[/red] Failed to initialize NewsAPI client: {e}")
         newsapi = None
 
 
@@ -52,7 +56,7 @@ def get_news(query: str, from_: str | None, to: str | None,
         # Return the list of articles
         return top_headlines['articles']
     except Exception as e:
-        print(f"Error fetching news articles: {e}")
+        console.print(f"[red]Error:[/red] Fetching news articles: {e}")
         return []
 
 # Define the function schema
@@ -104,12 +108,12 @@ def process_news_response(tool_call: Any) -> Dict[str, str]:
     to: str | None = arguments.get("to")
     sortBy: str = arguments.get("sortBy", "publishedAt")
 
-    print(f"Function call: get_news(query='{query}', from_='{from_}', to='{to}', sortBy='{sortBy}')")
+    console.print(f"[green]✓[/green] Function called: get_news(query='{query}', from_='{from_}', to='{to}', sortBy='{sortBy}')")
 
     # Call the function
     result: List[Dict[str, Any]] = get_news(query, from_, to, sortBy)
 
-    print(f"Function result: Found {len(result)} articles")
+    console.print(f"[green]✓[/green] Function result: Found {len(result)} articles")
 
     # Return the function result message
     return {

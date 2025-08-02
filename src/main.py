@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from openai.types.chat import ChatCompletionMessage, ChatCompletionMessageParam, ChatCompletionToolParam
 from rich.console import Console
+from rich.panel import Panel
 from typing import Dict, List, Any, cast
 
 # Load functions from helpers 
@@ -12,6 +13,9 @@ from helpers.news import get_news_function, process_news_response
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Initialize console for rich text output
+console = Console()
 
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -75,8 +79,10 @@ def chat_with_functions(user_input: str) -> None:
         )
 
         if second_response:
-            print("Response from OpenAI:")
-            print(second_response.choices[0].message.content)
+        # Response from OpenAI
+            content = second_response.choices[0].message.content or "No response content"
+            assistant_panel: Panel = Panel(content,title="[bold green]OpenAI Assistant[/bold green]",border_style="green",padding=(0, 1))
+            console.print(assistant_panel)
 
 
 def main() -> None:
