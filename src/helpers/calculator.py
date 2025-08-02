@@ -1,8 +1,13 @@
 import json
+from typing import Dict, Union, Literal, Any
 
+# Type definitions
+OperationType = Literal["add", "subtract", "multiply", "divide"]
+NumberType = Union[int, float]
+ResultType = Union[NumberType, str]
 
 # Define a function that performs calculations
-def calculate(operation, x, y):
+def calculate(operation: OperationType, x: NumberType, y: NumberType) -> ResultType:
     """
     Perform a mathematical operation on two numbers.
 
@@ -12,7 +17,7 @@ def calculate(operation, x, y):
         y: The second number
 
     Returns:
-        The result of the operation
+        The result of the operation or an error message
     """
     if operation == "add":
         return x + y
@@ -55,13 +60,21 @@ calculator_function = {
     }
 }
 
-def process_calculator_response(tool_call):
-    """Process calculator function call and return the result message"""
+def process_calculator_response(tool_call: Any) -> Dict[str, str]:
+    """
+    Process calculator function call and return the result message.
+    
+    Args:
+        tool_call: The tool call object from the API
+        
+    Returns:
+        A dictionary with the result message
+    """
     # Parse the function arguments
     arguments = json.loads(tool_call.function.arguments)
-    operation = arguments.get("operation")
-    x = arguments.get("x")
-    y = arguments.get("y")
+    operation = str(arguments.get("operation"))  # Explicit type casting
+    x = float(arguments.get("x"))  # Explicit type casting
+    y = float(arguments.get("y"))  # Explicit type casting
 
     print(f"Function call: calculate({operation}, {x}, {y})")
 
