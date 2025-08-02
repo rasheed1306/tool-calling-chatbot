@@ -3,8 +3,8 @@ from typing import Dict, Union, Literal, Any
 
 # Type definitions
 OperationType = Literal["add", "subtract", "multiply", "divide"]
-NumberType = Union[int, float]
-ResultType = Union[NumberType, str]
+NumberType = float | int
+ResultType = NumberType | str
 
 # Define a function that performs calculations
 def calculate(operation: OperationType, x: NumberType, y: NumberType) -> ResultType:
@@ -72,10 +72,10 @@ def process_calculator_response(tool_call: Any) -> Dict[str, str]:
     """
     # Parse the function arguments
     arguments = json.loads(tool_call.function.arguments)
-    operation = str(arguments.get("operation"))  # Explicit type casting
-    x = float(arguments.get("x"))  # Explicit type casting
-    y = float(arguments.get("y"))  # Explicit type casting
-
+    operation = arguments.get("operation")
+    x = arguments.get("x") 
+    y = arguments.get("y")
+    
     print(f"Function call: calculate({operation}, {x}, {y})")
 
     # Call the function
