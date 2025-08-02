@@ -23,7 +23,7 @@ else:
 
 
 # Define the get_news function
-def get_news(query: str, from_: Optional[str] = None, to: Optional[str] = None, 
+def get_news(query: str, from_: str | None, to: str | None, 
              sortBy: str = "publishedAt") -> List[Dict[str, Any]]:
     """
     Get news articles based on query with optional date filtering and sorting.
@@ -41,12 +41,6 @@ def get_news(query: str, from_: Optional[str] = None, to: Optional[str] = None,
     if newsapi is None:
         print("Error: NewsAPI client is not initialized. Cannot fetch news articles.")
         return []
-    
-    # Convert string 'None' to actual None
-    if from_ == 'None':
-        from_ = None
-    if to == 'None':
-        to = None
 
     try:
         top_headlines: Dict[str, Any] = newsapi.get_everything(
@@ -105,10 +99,10 @@ def process_news_response(tool_call: Any) -> Dict[str, str]:
     """
     # Parse the function arguments
     arguments = json.loads(tool_call.function.arguments)
-    query: str = str(arguments.get("query", ""))  # Explicit type casting
-    from_: Optional[str] = arguments.get("from")
-    to: Optional[str] = arguments.get("to")
-    sortBy: str = str(arguments.get("sortBy", "publishedAt"))  # Explicit type casting
+    query: str = arguments.get("query", "") 
+    from_: str | None = arguments.get("from")
+    to: str | None = arguments.get("to")
+    sortBy: str = arguments.get("sortBy", "publishedAt")
 
     print(f"Function call: get_news(query='{query}', from_='{from_}', to='{to}', sortBy='{sortBy}')")
 

@@ -7,21 +7,8 @@ from typing import Dict, Any
 # Load environment variables from .env file
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env'))
 
-WEATHER_API_KEY: str = os.getenv("WEATHER_API_KEY", "")
+WEATHER_API_KEY: str = os.getenv("WEATHER_API_KEY")
 WEATHER_URL_BASE: str = "https://api.weatherapi.com/v1/current.json"
-
-# # Initialize NewsAPI client with error checking
-# api_key = os.getenv("NEWS_API_KEY")
-# if not api_key:
-#     print("Error: NEWS_API_KEY not found in environment variables. Please check your .env file.")
-#     newsapi = None
-# else:
-#     try:
-#         newsapi = NewsApiClient(api_key=api_key)
-#         print("NewsAPI client initialized successfully.")
-#     except Exception as e:
-#         print(f"Error: Failed to initialize NewsAPI client: {e}")
-#         newsapi = None
 
 
 # Define get_weather function 
@@ -81,7 +68,7 @@ def process_weather_response(tool_call: Any) -> Dict[str, str]:
     """
     # Parse the function arguments
     arguments = json.loads(tool_call.function.arguments)
-    location: str = str(arguments.get("location", "Melbourne"))  # Explicit type casting
+    location: str = arguments.get("location", "Melbourne")
     
     print(f"Fetching weather for location: {location}")
     
