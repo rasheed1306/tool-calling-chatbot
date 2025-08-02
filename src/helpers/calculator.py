@@ -1,6 +1,10 @@
 import json
 from typing import Dict, Literal, Any
 from openai.types.chat import ChatCompletionMessage, ChatCompletionMessageParam, ChatCompletionToolParam
+from rich.console import Console
+
+# Initialize console for rich text output
+console = Console()
 
 
 # Type definitions
@@ -78,12 +82,13 @@ def process_calculator_response(tool_call: Any) -> Dict[str, str]:
     x = arguments.get("x") 
     y = arguments.get("y")
     
-    print(f"Function call: calculate({operation}, {x}, {y})")
+    console.print(f"🧮 [bold]calculate[/bold](operation={operation}, x={x}, y={y})")
 
-    # Call the function
-    result = calculate(operation, x, y)
+    # Call the function with status
+    with console.status("[yellow]Calculating...", spinner="dots"):
+        result = calculate(operation, x, y)
 
-    print(f"Function result: {result}")
+    console.print(f"[green]✓[/green] Result: {result}")
 
     # Return the function result message
     return {

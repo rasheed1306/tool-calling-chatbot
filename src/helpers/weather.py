@@ -1,14 +1,28 @@
 from dotenv import load_dotenv
 import os
-import json 
+import json
 import requests
 from typing import Dict, Any
 from openai.types.chat import ChatCompletionToolParam
+from rich.console import Console
 
 # Load environment variables from .env file
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env'))
 
-WEATHER_API_KEY: str | None = os.getenv("WEATHER_API_KEY")
+# Initialize console for rich text output
+console = Console()
+
+def verify_weather_api() -> bool:
+    """Verify Weather API key is available."""
+    api_key = os.getenv("WEATHER_API_KEY")
+    if not api_key:
+        console.print("[red]✗[/red] WEATHER_API_KEY not found in environment variables")
+        return False
+    console.print("[green]✓[/green] Weather API connected successfully")
+    return True
+
+# Verify API and set globals
+WEATHER_API_KEY: str | None = os.getenv("WEATHER_API_KEY") if verify_weather_api() else None
 WEATHER_URL_BASE: str = "https://api.weatherapi.com/v1/current.json"
 
 
@@ -28,7 +42,7 @@ def get_weather(location: str = "Melbourne") -> float:
     
     # Check if the request was successful
     if response.status_code != 200:
-        print('error', response.status_code)
+        console.print(f"[red]✗[/red] Weather API error: {response.status_code}")
         return 0.0  # Return a default value in case of error
     
     data: Dict[str, Any] = response.json()
@@ -71,10 +85,13 @@ def process_weather_response(tool_call: Any) -> Dict[str, str]:
     arguments = json.loads(tool_call.function.arguments)
     location: str = arguments.get("location", "Melbourne")
     
-    print(f"Fetching weather for location: {location}")
+    console.print(f"[white]🌤️[/white] [bold]get_weather[/bold]([white]location[/white]=[white]{location}[/white])")
     
-    # Call the function
-    result: float = get_weather(location)
+    # Call the function with status
+    with console.status("[yellow]Fetching weather data...", spinner="dots"):
+        result: float = get_weather(location)
+    
+    console.print(f"[green]✓[/green] Temperature: {result}°C")
     
     # Return the function result message
     return {

@@ -4,6 +4,7 @@ from openai import OpenAI
 from openai.types.chat import ChatCompletionMessage, ChatCompletionMessageParam, ChatCompletionToolParam
 from rich.console import Console
 from rich.panel import Panel
+from rich.rule import Rule
 from typing import Dict, List, Any, cast
 
 # Load functions from helpers 
@@ -17,8 +18,24 @@ load_dotenv()
 # Initialize console for rich text output
 console = Console()
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+def verify_openai_connection() -> OpenAI:
+    """Verify OpenAI API connection."""
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        console.print("[red]✗[/red] OPENAI_API_KEY not found in environment variables")
+        exit(1)
+    
+    with console.status("[yellow]Connecting to OpenAI...", spinner="dots"):
+        try:
+            openai_client = OpenAI(api_key=api_key)
+            console.print("[green]✓[/green] OpenAI connected successfully")
+            return openai_client
+        except Exception as e:
+            console.print(f"[red]✗[/red] OpenAI connection failed: {e}")
+            exit(1)
+
+# Initialize OpenAI client with verification
+client: OpenAI = verify_openai_connection()
 
 # Type annotation for messages
 messages: List[ChatCompletionMessageParam] = [
@@ -50,8 +67,11 @@ def chat_with_functions(user_input: str) -> None:
     assistant_message = response.choices[0].message
     messages.append(cast(ChatCompletionMessageParam, assistant_message.model_dump()))
 
-    # Check if the model wants to call a function 
+    # Check if the model wants to call a function
     if assistant_message.tool_calls:
+        console.print(Rule(style="white"))
+        console.print(f"🔧 [bold]Processing {len(assistant_message.tool_calls)} function call(s)[/bold]")
+        
         second_response = None
         for tool_call in assistant_message.tool_calls:
             function_name: str = tool_call.function.name
@@ -71,12 +91,12 @@ def chat_with_functions(user_input: str) -> None:
                 result_message = process_news_response(tool_call)
                 messages.append(cast(ChatCompletionMessageParam, result_message))
             
-            
         # Get a new response from the model with the function result
-        second_response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages
-        )
+        with console.status("[yellow]Generating final response...", spinner="dots"):
+            second_response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages
+            )
 
         if second_response:
         # Response from OpenAI

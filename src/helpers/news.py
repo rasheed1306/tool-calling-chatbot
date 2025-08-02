@@ -1,10 +1,14 @@
 from dotenv import load_dotenv
 from newsapi import NewsApiClient
 import os
-import json 
+import json
+import time
 from typing import Dict, Any, List
 from openai.types.chat import ChatCompletionToolParam
 from rich.console import Console
+from rich.spinner import Spinner
+from rich.panel import Panel
+from rich.rule import Rule
 
 # Load environment variables from .env file
 load_dotenv()
@@ -12,18 +16,37 @@ load_dotenv()
 # Initialize console for rich text output
 console = Console()
 
-# Initialize NewsAPI client with error checking
-api_key = os.getenv("NEWS_API_KEY")
-if not api_key:
-    console.print("[red]Error:[/red] NEWS_API_KEY not found in environment variables. Please check your .env file.")
-    newsapi = None
-else:
-    try:
-        newsapi = NewsApiClient(api_key=api_key)
-        console.print("[green]✓[/green] NewsAPI client initialized successfully.")
-    except Exception as e:
-        console.print(f"[red]Error:[/red] Failed to initialize NewsAPI client: {e}")
-        newsapi = None
+def verify_newsapi_connection() -> NewsApiClient | None:
+    """
+    Verify NewsAPI connection and return client if successful.
+    
+    Returns:
+        NewsApiClient instance if successful, None otherwise
+    """
+    # Check for API key
+    api_key = os.getenv("NEWS_API_KEY")
+    if not api_key:
+        console.print("[red]Error:[/red] NEWS_API_KEY not found in environment variables")
+        return None
+    
+    # Initialize and test client
+    with console.status("[yellow]Connecting to NewsAPI...", spinner="dots"):
+        try:
+            newsapi_client = NewsApiClient(api_key=api_key)
+            # Test connection
+            test_response = newsapi_client.get_everything(q="test", page_size=1)
+            if test_response and 'articles' in test_response:
+                console.print("[green]✓[/green] NewsAPI connected successfully")
+                return newsapi_client
+            else:
+                console.print("[red]✗[/red] Invalid response from NewsAPI")
+                return None
+        except Exception as e:
+            console.print(f"[red]✗[/red] NewsAPI connection failed: {e}")
+            return None
+
+# Initialize NewsAPI client with enhanced verification
+newsapi = verify_newsapi_connection()
 
 
 # Define the get_news function
@@ -108,12 +131,13 @@ def process_news_response(tool_call: Any) -> Dict[str, str]:
     to: str | None = arguments.get("to")
     sortBy: str = arguments.get("sortBy", "publishedAt")
 
-    console.print(f"[green]✓[/green] Function called: get_news(query='{query}', from_='{from_}', to='{to}', sortBy='{sortBy}')")
+    console.print(f"📰 [bold]get_news[/bold](query={query}, from={from_}, to={to}, sortBy={sortBy})")
 
-    # Call the function
-    result: List[Dict[str, Any]] = get_news(query, from_, to, sortBy)
+    # Call the function with status
+    with console.status("[yellow]Fetching articles...", spinner="dots"):
+        result: List[Dict[str, Any]] = get_news(query, from_, to, sortBy)
 
-    console.print(f"[green]✓[/green] Function result: Found {len(result)} articles")
+    console.print(f"[green]✓[/green] Found {len(result)} articles")
 
     # Return the function result message
     return {
