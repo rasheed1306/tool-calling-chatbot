@@ -6,8 +6,9 @@ from openai import OpenAI
 from rich.console import Console
 
 # Load functions from helpers 
-from helpers.calculator import calculate, calculator_function, process_calculator_response
-from helpers.weather import get_weather, get_weather_function, process_weather_response
+from helpers.calculator import calculator_function, process_calculator_response
+from helpers.weather import get_weather_function, process_weather_response
+from helpers.news import get_news, get_news_function, process_news_response
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,7 +17,7 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 messages = [
-        {"role": "system", "content": "You are a helpful assistant that can answer questions and get weather information"},
+        {"role": "system", "content": "You are a helpful assistant that can answer maths calculations, give news updates and get weather information"},
     ]
 
 
@@ -30,7 +31,7 @@ def chat_with_functions(user_input):
         messages=messages,
         temperature = 0.7, 
         max_tokens = 150,
-        tools = [calculator_function, get_weather_function],
+        tools = [calculator_function, get_weather_function, get_news_function],
         tool_choice = "auto",
         )
     
@@ -53,6 +54,11 @@ def chat_with_functions(user_input):
                 result_message = process_weather_response(tool_call)
                 messages.append(result_message)
             
+            elif function_name == "get_news":
+                # Process news function call and append the result to messages
+                result_message = process_news_response(tool_call)
+                messages.append(result_message)
+            
             
             # Get a new response from the model with the function result
             second_response = client.chat.completions.create(
@@ -66,9 +72,9 @@ def chat_with_functions(user_input):
 
 
 def main(): 
-    chat_with_functions("What's 241 multiplied by 18?")
-    chat_with_functions("What's the weather in Melbourne?")
-    chat_with_functions("What's the humidity in Melbourne? Should I take an umbrella?")
+    # chat_with_functions("What's 241 multiplied by 18?")
+    # chat_with_functions("What's the weather in Melbourne?")
+    chat_with_functions("Can you tell me latest news about bitcoin from 2/07/2025?")
   
   
 if __name__ == "__main__":
