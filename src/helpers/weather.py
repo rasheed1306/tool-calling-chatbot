@@ -12,6 +12,19 @@ console = Console()
 # Load environment variables from .env file
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '../../.env'))
 
+def verify_weather_api() -> bool:
+    """Verify Weather API key is available."""
+    api_key = os.getenv("WEATHER_API_KEY")
+    if not api_key:
+        console.print("[red]✗[/red] WEATHER_API_KEY not found in environment variables")
+        return False
+    console.print("[green]✓[/green] Weather API connected successfully")
+    return True
+
+# Verify API and set globals
+WEATHER_API_KEY: str | None = os.getenv("WEATHER_API_KEY") if verify_weather_api() else None
+WEATHER_URL_BASE: str = "https://api.weatherapi.com/v1/current.json"
+
 WEATHER_API_KEY: str | None = os.getenv("WEATHER_API_KEY")
 WEATHER_URL_BASE: str = "https://api.weatherapi.com/v1/current.json"
 

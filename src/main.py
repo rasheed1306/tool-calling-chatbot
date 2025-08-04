@@ -98,11 +98,10 @@ def chat_with_functions(user_input: str) -> None:
                 messages=messages
             )
 
-        if second_response:
         # Response from OpenAI
-            content = second_response.choices[0].message.content or "No response content"
-            assistant_panel: Panel = Panel(content,title="[bold green]OpenAI Assistant[/bold green]",border_style="green",padding=(0, 1))
-            console.print(assistant_panel)
+        content = second_response.choices[0].message.content or "No response content"
+        assistant_panel: Panel = Panel(content,title="[bold green]OpenAI Assistant[/bold green]",border_style="green",padding=(0, 1))
+        console.print(assistant_panel)
 
 
 def main() -> None:
@@ -131,7 +130,7 @@ def main() -> None:
                 continue
             
             chat_with_functions(usr_input)
-            console.print(Rule(style="dim"))
+            console.print(Rule(style="white"))
             
         except KeyboardInterrupt:
             console.print("\n[bold red]👋 Goodbye![/bold red]")
