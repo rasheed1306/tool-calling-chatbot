@@ -5,6 +5,7 @@ from openai.types.chat import  ChatCompletionMessageParam
 from rich.console import Console
 from rich.panel import Panel
 from rich.rule import Rule
+from rich.markdown import Markdown
 from typing import List, cast
 
 # Load functions from helpers 
@@ -104,11 +105,11 @@ def chat_with_functions(user_input: str) -> None:
 
         # Response from OpenAI
         content = final_message.content or "No response content"
-        assistant_panel: Panel = Panel(content,title="[bold green]OpenAI Assistant[/bold green]",border_style="green",padding=(0, 1))
+        assistant_panel: Panel = Panel(Markdown(content),title="[bold green]OpenAI Assistant[/bold green]",border_style="green",padding=(0, 1))
         console.print(assistant_panel)
     else:
         content = assistant_message.content or "No response content"
-        assistant_panel: Panel = Panel(content,title="[bold green]OpenAI Assistant[/bold green]",border_style="green",padding=(0, 1))
+        assistant_panel: Panel = Panel(Markdown(content),title="[bold green]OpenAI Assistant[/bold green]",border_style="green",padding=(0, 1))
         console.print(assistant_panel)
 
 def main() -> None:
