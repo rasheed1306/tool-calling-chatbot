@@ -97,12 +97,19 @@ def chat_with_functions(user_input: str) -> None:
                 model="gpt-4o-mini",
                 messages=messages
             )
+            
+        # Add the final response to messages for conversation context
+        final_message = second_response.choices[0].message
+        messages.append(cast(ChatCompletionMessageParam, final_message.model_dump()))
 
         # Response from OpenAI
-        content = second_response.choices[0].message.content or "No response content"
+        content = final_message.content or "No response content"
         assistant_panel: Panel = Panel(content,title="[bold green]OpenAI Assistant[/bold green]",border_style="green",padding=(0, 1))
         console.print(assistant_panel)
-
+    else:
+        content = assistant_message.content or "No response content"
+        assistant_panel: Panel = Panel(content,title="[bold green]OpenAI Assistant[/bold green]",border_style="green",padding=(0, 1))
+        console.print(assistant_panel)
 
 def main() -> None:
     """Main function to demonstrate the chat functionality."""
@@ -136,7 +143,7 @@ def main() -> None:
             console.print("\n[bold red]👋 Goodbye![/bold red]")
             break
         except Exception as e:
-            console.print(f"[red]❌ Error: {e}[/red]")
+            console.print(f"[red]✗ Error: {e}[/red]")
             
 
 
