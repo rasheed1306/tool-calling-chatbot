@@ -107,18 +107,38 @@ def chat_with_functions(user_input: str) -> None:
 
 def main() -> None:
     """Main function to demonstrate the chat functionality."""
-    chat_with_functions("What's 241 multiplied by 18?")
-    chat_with_functions("What's the weather in Melbourne?")
-    chat_with_functions("Can you tell me latest news about bitcoin from 2/07/2025?")
-    
-    while True:
-        usr_input = input("Enter a prompt (or q to quit): ")
-        if usr_input.lower() == "q":
-            console.print("[bold red]Exiting...[/bold red]")
-            break
+    # chat_with_functions("What's 241 multiplied by 18?")
+    # chat_with_functions("What's the weather in Melbourne?")
+    # chat_with_functions("Can you tell me latest news about bitcoin from 2/07/2025?")
 
-        chat_with_functions(usr_input)
-        console.print(Rule(style="white"))
+    while True:   
+        try:
+            usr_input = input("\n💬 Enter a prompt (or q to quit): ").strip()
+            
+            if usr_input.lower() == "q":
+                console.print("[bold red]👋 Exiting... Goodbye![/bold red]")
+                break
+            elif usr_input.lower() == "clear":
+                # Reset messages but keep the system message
+                global messages
+                messages = [
+                    {"role": "system", "content": "You are a helpful assistant that can answer maths calculations, give news updates and get weather information"},
+                ]
+                console.print("[yellow]🗑️ Conversation history cleared[/yellow]")
+                continue
+            elif not usr_input:
+                console.print("[yellow]Please enter a message[/yellow]")
+                continue
+            
+            chat_with_functions(usr_input)
+            console.print(Rule(style="dim"))
+            
+        except KeyboardInterrupt:
+            console.print("\n[bold red]👋 Goodbye![/bold red]")
+            break
+        except Exception as e:
+            console.print(f"[red]❌ Error: {e}[/red]")
+            
 
 
 if __name__ == "__main__":
